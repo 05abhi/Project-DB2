@@ -1,0 +1,186 @@
+000100 IDENTIFICATION DIVISION.                                         00010000
+000200 PROGRAM-ID. PROG07.                                              00020002
+000300 ENVIRONMENT DIVISION.                                            00030000
+000400                                                                  00040001
+000500 INPUT-OUTPUT SECTION.                                            00050000
+000600 FILE-CONTROL.                                                    00060000
+000700     SELECT REPORT-FILE ASSIGN TO REPFILE                         00070000
+000800     ORGANIZATION IS SEQUENTIAL                                   00080000
+000900     ACCESS MODE  IS SEQUENTIAL                                   00090000
+001000     FILE STATUS  IS WS-REP-STAT.                                 00100000
+001100                                                                  00110001
+001200 DATA DIVISION.                                                   00120000
+001300 FILE SECTION.                                                    00130000
+001400 FD  REPORT-FILE                                                  00140000
+001500     RECORD CONTAINS 80 CHARACTERS                                00150000
+001600     RECORDING MODE IS F.                                         00160000
+001700 01  REPORT-RECORD PIC X(80).                                     00170000
+001800                                                                  00180001
+001900 WORKING-STORAGE SECTION.                                         00190000
+002000 01  WS-REP-STAT          PIC X(02).                              00200000
+002100 01  WS-SQLCODE           PIC S9(03) VALUE ZEROS.                 00210000
+002200                                                                  00220004
+002300 01  HEADING-LINE1.                                               00230000
+002400     03  FILLER           PIC X(30) VALUE SPACES.                 00240004
+002500     03  FILLER           PIC X(20) VALUE 'LOGISTICS MANAGEMENT'. 00250004
+002600     03  FILLER           PIC X(30) VALUE SPACES.                 00260004
+002700                                                                  00270004
+002800 01  HEADING-LINE2.                                               00280000
+002900     03  FILLER           PIC X(33) VALUE SPACES.                 00290000
+003000     03  FILLER           PIC X(14) VALUE 'PRODUCT STATUS'.       00300004
+003100     03  FILLER           PIC X(33) VALUE SPACES.                 00310000
+003200                                                                  00320004
+003300 01  HEADING-LINE3.                                               00330000
+003400     03  FILLER           PIC X(08) VALUE 'ORDER-ID'.             00340003
+003500     03  FILLER           PIC X(01) VALUE SPACES.                 00350003
+003600     03  FILLER           PIC X(07) VALUE 'USER-ID'.              00360003
+003700     03  FILLER           PIC X(01) VALUE SPACES.                 00370003
+003800     03  FILLER           PIC X(10) VALUE 'PRODUCT-ID'.           00380003
+003900     03  FILLER           PIC X(01) VALUE SPACES.                 00390003
+004000     03  FILLER           PIC X(08) VALUE 'QUANTITY'.             00400003
+004100     03  FILLER           PIC X(01) VALUE SPACES.                 00410003
+004200     03  FILLER           PIC X(09) VALUE 'PRICE'.                00420003
+004300     03  FILLER           PIC X(01) VALUE SPACES.                 00430003
+004400     03  FILLER           PIC X(12) VALUE 'BOOKING-DATE'.         00440003
+004500     03  FILLER           PIC X(01) VALUE SPACES.                 00450003
+004600     03  FILLER           PIC X(13) VALUE 'DELIVERY-DATE'.        00460003
+004700     03  FILLER           PIC X(07) VALUE SPACES.                 00470003
+004800                                                                  00480004
+004900 01  DETAIL-LINE.                                                 00490000
+005000     03  d-OID            PIC 9(04) VALUE ZEROS.                  00500000
+005100     03  FILLER           PIC X(05) VALUE SPACES.                 00510003
+005200     03  d-uid            PIC X(05) VALUE SPACES.                 00520000
+005300     03  FILLER           PIC X(03) VALUE SPACES.                 00530000
+005400     03  d-PID            PIC X(03) VALUE SPACES.                 00540000
+005500     03  FILLER           PIC X(08) VALUE SPACES.                 00550003
+005600     03  d-QTY            PIC 9(03) VALUE ZEROS.                  00560000
+005700     03  FILLER           PIC X(06) VALUE SPACES.                 00570003
+005800     03  d-PRICE          PIC 9(05) VALUE ZEROS.                  00580000
+005900     03  FILLER           PIC X(05) VALUE SPACES.                 00590003
+006000     03  D-BOOK           PIC X(10) VALUE SPACES.                 00600000
+006100     03  FILLER           PIC X(03) VALUE SPACES.                 00610000
+006200     03  D-DEL            PIC X(10) VALUE SPACES.                 00620000
+006300     03  FILLER           PIC X(10) VALUE SPACES.                 00630003
+006400                                                                  00640004
+006500 01  FOOTER-LINE.                                                 00650004
+006600     03  FILLER           PIC X(80) VALUE ALL '*'.                00660004
+006700                                                                  00670004
+006800 01  FOOTER-LINE1.                                                00680005
+006900     03  FILLER           PIC X(80) VALUE ALL ' '.                00690005
+007000                                                                  00700005
+007100 01  FOOTER-LINE2.                                                00710005
+007200     03  FILLER           PIC X(80) VALUE ALL '-'.                00720005
+007300                                                                  00730005
+007400 01  FOOTER-LINE3.                                                00740005
+007500     03  FILLER           PIC X(10) VALUE SPACES.                 00750004
+007600     03  FILLER           PIC X(59) VALUE                         00760004
+007700     '***********************END OF REPORT**********************'.00770004
+007800     03  FILLER           PIC X(11) VALUE SPACES.                 00780004
+007900                                                                  00790004
+008000 01 ERROR-MESSAGE.                                                00800004
+008100   05 ERROR-MESSAGE-LENGTH   PIC S9(4) COMP VALUE +800.           00810004
+008200   05 ERROR-MESSAGE-LINE     PIC X(80) OCCURS 10 TIMES            00820004
+008300                                  INDEXED BY EML-INDEX.           00830004
+008400 01 ERROR-LINE-LENGTH        PIC S9(9) COMP VALUE +80.            00840004
+008500                                                                  00850004
+008600     EXEC SQL                                                     00860004
+008700          INCLUDE ORDER                                           00870004
+008800     END-EXEC.                                                    00880004
+008900                                                                  00890004
+009000     EXEC SQL                                                     00900004
+009100         DECLARE order_CUR CURSOR FOR                             00910004
+009200         SELECT ord_id                                            00920004
+009300               ,o_uid                                             00930004
+009400               ,o_pid                                             00940004
+009500               ,quantity                                          00950004
+009600               ,price                                             00960004
+009700               ,book_date                                         00970004
+009800               ,del_date                                          00980004
+009900         FROM T24_ORDER_TABLE                                     00990004
+010000         WHERE book_date = (select current date                   01000004
+010100                             from sysibm.sysdummy1)               01010004
+010200     END-EXEC.                                                    01020004
+010300                                                                  01030004
+010400     EXEC SQL                                                     01040004
+010500          INCLUDE SQLCA                                           01050004
+010600     END-EXEC.                                                    01060004
+010700                                                                  01070004
+010800 PROCEDURE DIVISION.                                              01080004
+010900 0000-MAIN-PARA.                                                  01090004
+011000     DISPLAY '0000-MAIN-PARA'                                     01100004
+011100     OPEN OUTPUT REPORT-FILE                                      01110004
+011200     PERFORM 1000-HEADING-PARA                                    01120004
+011300     PERFORM 2000-OPEN-CURSOR                                     01130004
+011400     PERFORM UNTIL SQLCODE = 100                                  01140004
+011500         PERFORM 3000-PROCESS-PARA                                01150004
+011600     END-PERFORM                                                  01160004
+011700     PERFORM 8000-CLOSE-CURSOR                                    01170004
+011800     PERFORM 9000-EXIT-PARA                                       01180004
+011900     STOP RUN.                                                    01190004
+012000                                                                  01200004
+012100 1000-HEADING-PARA.                                               01210004
+012200     DISPLAY '1000-HEADING-PARA'                                  01220004
+012300     WRITE REPORT-RECORD FROM HEADING-LINE1                       01230004
+012400     WRITE REPORT-RECORD FROM FOOTER-LINE                         01240005
+012500     WRITE REPORT-RECORD FROM HEADING-LINE2                       01250004
+012600     WRITE REPORT-RECORD FROM FOOTER-LINE2                        01260005
+012700     WRITE REPORT-RECORD FROM HEADING-LINE3                       01270005
+012800     WRITE REPORT-RECORD FROM FOOTER-LINE2.                       01280005
+012900                                                                  01290004
+013000 2000-OPEN-CURSOR.                                                01300004
+013100     DISPLAY '2000-OPEN-CURSOR'                                   01310004
+013200     EXEC SQL                                                     01320004
+013300         OPEN ORDER_CUR                                           01330004
+013400     END-EXEC                                                     01340004
+013500     DISPLAY 'OPNCRSR SQL =', SQLCODE.                            01350004
+013600                                                                  01360004
+013700 3000-PROCESS-PARA.                                               01370004
+013800     DISPLAY '3000-PROCESS-PARA'                                  01380004
+013900     PERFORM 4000-FETCH-RECORD                                    01390004
+014000     EVALUATE SQLCODE                                             01400004
+014100       WHEN ZERO                                                  01410004
+014200           PERFORM 5000-MOVE-ORDER-PARA                           01420004
+014300       WHEN 100                                                   01430004
+014400          DISPLAY 'END-OF-RECORD'                                 01440004
+014500       WHEN OTHER                                                 01450004
+014600           PERFORM 1010-ERROR-PARA                                01460004
+014700     END-EVALUATE.                                                01470004
+014800                                                                  01480004
+014900 4000-FETCH-RECORD.                                               01490004
+015000     DISPLAY '4000-FETCH-RECORD'                                  01500004
+015100     EXEC SQL                                                     01510004
+015200         FETCH ORDER_CUR INTO                                     01520004
+015300         :Ord-ID, :O-uID, :O-pID, :QUANTity, :PRICE,              01530004
+015400         :BOOK-DATE, :DEL-DATE                                    01540004
+015500     END-EXEC                                                     01550004
+015600     DISPLAY 'FETCH SQL =', SQLCODE.                              01560004
+015700                                                                  01570004
+015800 5000-MOVE-ORDER-PARA.                                            01580004
+015900     DISPLAY '5000-MOVE-ORDER-PARA'                               01590004
+016000     MOVE ORD-ID       TO D-OID                                   01600004
+016100     MOVE O-PID        TO D-PID                                   01610004
+016200     MOVE O-UID        TO D-UID                                   01620004
+016300     MOVE QUANTITY     TO D-QTY                                   01630004
+016400     MOVE PRICE        TO D-PRICE                                 01640004
+016500     MOVE BOOK-DATE    TO D-BOOK                                  01650004
+016600     MOVE DEL-DATE     TO D-DEL                                   01660004
+016700     WRITE REPORT-RECORD FROM DETAIL-LINE.                        01670004
+016800                                                                  01680004
+016900 8000-CLOSE-CURSOR.                                               01690004
+017000     DISPLAY '8000-CLOSE-CURSOR'                                  01700004
+017100     EXEC SQL                                                     01710004
+017200         CLOSE ORDER_CUR                                          01720004
+017300     END-EXEC.                                                    01730004
+017400                                                                  01740004
+017500 9000-EXIT-PARA.                                                  01750004
+017600     WRITE REPORT-RECORD FROM FOOTER-LINE2                        01760005
+017700     CLOSE REPORT-FILE.                                           01770005
+017800                                                                  01780004
+017900 1010-ERROR-PARA.                                                 01790004
+018000     DISPLAY '1010-ERROR-PARA'                                    01800004
+018100     CALL 'DSNTIAR' USING SQLCA                                   01810004
+018200         ERROR-MESSAGE                                            01820004
+018300         ERROR-LINE-LENGTH                                        01830004
+018400     DISPLAY '*----------------------------------------------*'   01840004
+018500     DISPLAY ERROR-MESSAGE-LINE(EML-INDEX)                        01850004
+018600     DISPLAY '*----------------------------------------------*'.  01860004

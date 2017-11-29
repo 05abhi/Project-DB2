@@ -1,0 +1,171 @@
+000100 IDENTIFICATION DIVISION.                                         00010000
+000200 PROGRAM-ID. PROG08.                                              00020000
+000300 ENVIRONMENT DIVISION.                                            00030000
+000400 INPUT-OUTPUT SECTION.                                            00040000
+000500                                                                  00050000
+000600 FILE-CONTROL.                                                    00060000
+000700     SELECT REPORT-FILE ASSIGN TO REPFILE                         00070004
+000800     ORGANIZATION IS SEQUENTIAL                                   00080000
+000900     ACCESS MODE  IS SEQUENTIAL                                   00090000
+001000     FILE STATUS  IS WS-REP-STAT.                                 00100000
+001100                                                                  00110000
+001200 DATA DIVISION.                                                   00120000
+001300 FILE SECTION.                                                    00130000
+001400 FD  REPORT-FILE                                                  00140000
+001500     RECORD CONTAINS 80 CHARACTERS                                00150000
+001600     RECORDING MODE IS F.                                         00160000
+001700 01  REPORT-RECORD PIC X(80).                                     00170000
+001800                                                                  00180002
+001900 WORKING-STORAGE SECTION.                                         00190000
+002000 01  WS-REP-STAT          PIC X(02).                              00200000
+002100 01  WS-SQLCODE           PIC S9(03) VALUE ZEROS.                 00210000
+002200                                                                  00220002
+002300 01  HEADING-LINE1.                                               00230000
+002400     03  FILLER           PIC X(30) VALUE SPACES.                 00240004
+002500     03  FILLER           PIC X(20) VALUE 'LOGISTICS MANAGEMENT'. 00250005
+002600     03  FILLER           PIC X(30) VALUE SPACES.                 00260004
+002700                                                                  00270002
+002800 01  HEADING-LINE2.                                               00280000
+002900     03  FILLER           PIC X(33) VALUE SPACES.                 00290000
+003000     03  FILLER           PIC X(14) VALUE 'PRODUCT STATUS'.       00300004
+003100     03  FILLER           PIC X(33) VALUE SPACES.                 00310000
+003200                                                                  00320002
+003300 01  HEADING-LINE3.                                               00330000
+003400     03  FILLER           PIC X(05) VALUE 'ID'.                   00340004
+003500     03  FILLER           PIC X(01) VALUE SPACES.                 00350005
+003600     03  FILLER           PIC X(15) VALUE 'NAME'.                 00360005
+003700     03  FILLER           PIC X(01) VALUE SPACES.                 00370005
+003800     03  FILLER           PIC X(08) VALUE 'PRICE'.                00380005
+003900     03  FILLER           PIC X(01) VALUE SPACES.                 00390005
+004000     03  FILLER           PIC X(07) VALUE 'MIN-QTY'.              00400000
+004100     03  FILLER           PIC X(01) VALUE SPACES.                 00410005
+004200     03  FILLER           PIC X(09) VALUE 'AVAIL-QTY'.            00420000
+004300     03  FILLER           PIC X(01) VALUE SPACES.                 00430005
+004400     03  FILLER           PIC X(15) VALUE 'DEALER'.               00440005
+004500     03  FILLER           PIC X(16) VALUE SPACES.                 00450005
+004600                                                                  00460002
+004700 01  HEADING-LINE4.                                               00470000
+004800     03  FILLER           PIC X(70) VALUE ALL '-'.                00480000
+004900                                                                  00490002
+005000 01  DETAIL-LINE.                                                 00500000
+005100     03  P-ID             PIC 9(03) VALUE ZEROS.                  00510000
+005200     03  FILLER           PIC X(03) VALUE SPACES.                 00520005
+005300     03  P-NAME           PIC X(15) VALUE SPACES.                 00530000
+005400     03  FILLER           PIC X(01) VALUE SPACES.                 00540005
+005500     03  P-PRICE          PIC X(06) VALUE SPACES.                 00550000
+005600     03  FILLER           PIC X(03) VALUE SPACES.                 00560005
+005700     03  P-MINQTY         PIC 9(03) VALUE ZEROS.                  00570000
+005800     03  FILLER           PIC X(05) VALUE SPACES.                 00580005
+005900     03  P-AVQTY          PIC 9(05) VALUE ZEROS.                  00590000
+006000     03  FILLER           PIC X(05) VALUE SPACES.                 00600005
+006100     03  P-DLR            PIC X(15) VALUE SPACES.                 00610000
+006200     03  FILLER           PIC X(16) VALUE SPACES.                 00620005
+006300                                                                  00630002
+006400 01  FOOTER-LINE.                                                 00640000
+006500     03  FILLER           PIC X(10) VALUE SPACES.                 00650000
+006600     03  FILLER           PIC X(59) VALUE                         00660000
+006700     '***********************END OF REPORT**********************'.00670000
+006800     03  FILLER           PIC X(11) VALUE SPACES.                 00680000
+006900                                                                  00690002
+007000 01 ERROR-MESSAGE.                                                00700000
+007100   05 ERROR-MESSAGE-LENGTH   PIC S9(4) COMP VALUE +800.           00710000
+007200   05 ERROR-MESSAGE-LINE     PIC X(80) OCCURS 10 TIMES            00720000
+007300                                  INDEXED BY EML-INDEX.           00730000
+007400 01 ERROR-LINE-LENGTH        PIC S9(9) COMP VALUE +80.            00740000
+007500                                                                  00750002
+007600     EXEC SQL                                                     00760000
+007700          INCLUDE PROD                                            00770003
+007800     END-EXEC.                                                    00780000
+007900     EXEC SQL                                                     00790000
+008000          INCLUDE DEAL                                            00800003
+008100     END-EXEC.                                                    00810000
+008200                                                                  00820002
+008300     EXEC SQL                                                     00830000
+008400         DECLARE PROD_CUR CURSOR FOR                              00840000
+008500         SELECT A.PROD_ID, A.PROD_NAME, A.PROD_PRICE,             00850000
+008600         A.PROD_MIN_QUANT,                                        00860000
+008700         A.PROD_AVAIL_QUANT, PROD_DEAL_ID, DEAL_NAME              00870000
+008800         FROM   T24_PRODUCT_TABLE A,                              00880001
+008900                T24_DEALER_TABLE B                                00890001
+009000         WHERE A.PROD_DEAL_ID = B.DEAL_ID                         00900000
+009100     END-EXEC                                                     00910000
+009200     EXEC SQL                                                     00920000
+009300          INCLUDE SQLCA                                           00930000
+009400     END-EXEC.                                                    00940000
+009500                                                                  00950002
+009600 PROCEDURE DIVISION.                                              00960000
+009700 0000-MAIN-PARA.                                                  00970000
+009800     DISPLAY '0000-MAIN-PARA'                                     00980000
+009900     OPEN OUTPUT REPORT-FILE                                      00990000
+010000     PERFORM 1000-HEADING-PARA                                    01000000
+010100     PERFORM 2000-OPEN-CURSOR                                     01010000
+010200     PERFORM UNTIL SQLCODE = 100                                  01020000
+010300         PERFORM 3000-PROCESS-PARA                                01030000
+010400     END-PERFORM                                                  01040000
+010500     PERFORM 8000-CLOSE-CURSOR                                    01050000
+010600     PERFORM 9000-EXIT-PARA                                       01060000
+010700     STOP RUN.                                                    01070000
+010800                                                                  01080002
+010900 1000-HEADING-PARA.                                               01090000
+011000     DISPLAY '1000-HEADING-PARA'                                  01100000
+011100     WRITE REPORT-RECORD FROM HEADING-LINE1                       01110000
+011200     WRITE REPORT-RECORD FROM HEADING-LINE2                       01120000
+011300     WRITE REPORT-RECORD FROM HEADING-LINE3                       01130000
+011400     WRITE REPORT-RECORD FROM HEADING-LINE4.                      01140000
+011500                                                                  01150002
+011600 2000-OPEN-CURSOR.                                                01160000
+011700     DISPLAY '2000-OPEN-CURSOR'                                   01170000
+011800     EXEC SQL                                                     01180000
+011900         OPEN PROD_CUR                                            01190000
+012000     END-EXEC                                                     01200000
+012100     DISPLAY 'OPNCRSR SQL =', SQLCODE.                            01210000
+012200                                                                  01220002
+012300 3000-PROCESS-PARA.                                               01230000
+012400     DISPLAY '3000-PROCESS-PARA'                                  01240000
+012500     PERFORM 4000-FETCH-RECORD                                    01250000
+012600     EVALUATE SQLCODE                                             01260000
+012700       WHEN ZERO                                                  01270000
+012800           PERFORM 5000-MOVE-DATA-PARA                            01280000
+012900       WHEN 100                                                   01290000
+013000          DISPLAY 'END-OF-RECORD'                                 01300000
+013100       WHEN OTHER                                                 01310000
+013200           PERFORM 1010-ERROR-PARA                                01320000
+013300     END-EVALUATE.                                                01330000
+013400                                                                  01340002
+013500 4000-FETCH-RECORD.                                               01350000
+013600     DISPLAY '4000-FETCH-RECORD'                                  01360000
+013700     EXEC SQL                                                     01370000
+013800         FETCH PROD_CUR INTO                                      01380000
+013900         :PROD-ID, :PROD-NAME, :PROD-PRICE,                       01390000
+014000          :PROD-MIN-QUANT, :PROD-AVAIL-QUANT, :PROD-DEAL-ID,      01400000
+014100          :DEAL-NAME                                              01410000
+014200     END-EXEC.                                                    01420000
+014300     DISPLAY 'FETCH SQL =', SQLCODE.                              01430000
+014400                                                                  01440002
+014500 5000-MOVE-DATA-PARA.                                             01450000
+014600     DISPLAY '5000-MOVE-DATA-PARA'                                01460000
+014700     MOVE PROD-ID                    TO P-ID                      01470000
+014800     MOVE PROD-NAME                  TO P-NAME                    01480000
+014900     MOVE PROD-PRICE                 TO P-PRICE                   01490000
+015000     MOVE PROD-MIN-QUANT             TO P-MINQTY                  01500000
+015100     MOVE PROD-AVAIL-QUANT           TO P-AVQTY                   01510000
+015200     MOVE DEAL-NAME                  TO P-DLR                     01520000
+015300     WRITE REPORT-RECORD FROM DETAIL-LINE.                        01530000
+015400                                                                  01540002
+015500 8000-CLOSE-CURSOR.                                               01550000
+015600     DISPLAY '8000-CLOSE-CURSOR'                                  01560000
+015700     EXEC SQL                                                     01570000
+015800         CLOSE PROD_CUR                                           01580000
+015900     END-EXEC.                                                    01590000
+016000                                                                  01600002
+016100 9000-EXIT-PARA.                                                  01610000
+016200      CLOSE REPORT-FILE.                                          01620000
+016300                                                                  01630002
+016400 1010-ERROR-PARA.                                                 01640000
+016500     DISPLAY '1010-ERROR-PARA'                                    01650000
+016600     CALL 'DSNTIAR' USING SQLCA                                   01660000
+016700         ERROR-MESSAGE                                            01670000
+016800         ERROR-LINE-LENGTH                                        01680000
+016900     DISPLAY '*----------------------------------------------*'   01690000
+017000     DISPLAY ERROR-MESSAGE-LINE(EML-INDEX)                        01700000
+017100     DISPLAY '*----------------------------------------------*'.  01710000
